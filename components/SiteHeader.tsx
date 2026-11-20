@@ -2,12 +2,22 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { Button } from "./ui/button";
-import { Link2 } from "lucide-react";
-import { Show, SignInButton, SignUpButton } from "@clerk/nextjs";
+import { usePathname } from "next/navigation";
+
+import {
+  OrganizationSwitcher,
+  Show,
+  SignInButton,
+  SignUpButton,
+  useAuth,
+  UserButton,
+} from "@clerk/nextjs";
 
 const SiteHeader = () => {
-  const isSignedIn = false;
-  const isLandingPage = true;
+  const pathname = usePathname();
+
+  const { isSignedIn } = useAuth();
+  const isLandingPage = pathname === "/";
 
   return (
     <header className=" fixed inset-x-0 top-0 z-20 flex h-18 items center justify-between border-b border-white/6 bg-background/70 px-6 backdrop-blur-md md:px-10">
@@ -52,9 +62,7 @@ const SiteHeader = () => {
       <div className="flex items-center gap-3">
         <Show when="signed-out">
           <SignInButton mode="modal">
-            <Button variant="ghost" size="sm"></Button>
-
-            <Button asChild variant="ghost" size="sm">
+            <Button variant="ghost" size="sm">
               Sign in
             </Button>
           </SignInButton>
@@ -62,6 +70,20 @@ const SiteHeader = () => {
           <SignUpButton mode="modal">
             <Button size="sm">Get started</Button>
           </SignUpButton>
+        </Show>
+
+        <Show when="signed-in">
+          <OrganizationSwitcher
+            afterCreateOrganizationUrl="/dashboard"
+            afterSelectOrganizationUrl="/dashboard"
+          />
+          {isLandingPage && (
+            <Button variant="ghost" size="sm">
+              Dashboard
+            </Button>
+          )}
+
+          <UserButton />
         </Show>
       </div>
     </header>
